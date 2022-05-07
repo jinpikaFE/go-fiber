@@ -1,13 +1,14 @@
 package main
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"fmt"
+
+	"github.com/jinpikaFE/go_fiber/pkg/setting"
+	"github.com/jinpikaFE/go_fiber/routers"
+)
 
 func main() {
-  app := fiber.New()
+	app := routers.InitRouter()
 
-  app.Get("/", func(c *fiber.Ctx) error {
-    return c.SendString("Hello, World!")
-  })
-
-  app.Listen(":9999")
+	app.Listen(fmt.Sprintf(":%d", setting.HTTPPort))
 }
