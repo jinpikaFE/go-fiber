@@ -2,7 +2,7 @@ package routers
 
 import (
 	"github.com/gofiber/fiber/v2"
-	v1 "github.com/jinpikaFE/go_fiber/routers/v1"
+	controller "github.com/jinpikaFE/go_fiber/controllers"
 )
 
 func InitRouter() *fiber.App {
@@ -11,7 +11,10 @@ func InitRouter() *fiber.App {
 	apiv1 := app.Group("/v1")
 
 	{
-		apiv1.Get("/test", v1.GetTests)
+		apiv1.Get("/test", controller.GetTests)
+		apiv1.Post("/test", controller.AddTest)
+		apiv1.Put("/test/:id", controller.EditTest)
+		apiv1.Delete("/test/:id", controller.DelTest)
 	}
 
 	return app
