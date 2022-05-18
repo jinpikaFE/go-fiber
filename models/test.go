@@ -10,7 +10,7 @@ type Test struct {
 	Model
 
 	// query tag是query参数别名，json xml，form适合post
-	Name string `query:"name" json:"name" xml:"name" form:"name"`
+	Name string `validate:"required,min=3,max=32" query:"name" json:"name" xml:"name" form:"name"`
 }
 
 func GetTests(pageNum int, pageSize int, maps interface{}) (tests []Test) {

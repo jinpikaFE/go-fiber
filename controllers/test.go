@@ -1,16 +1,13 @@
 package controller
 
 import (
-	"log"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/jinpikaFE/go_fiber/models"
+	"github.com/jinpikaFE/go_fiber/pkg/logging"
+	"github.com/jinpikaFE/go_fiber/pkg/valodates"
 )
-
-// var (
-// 	me
-// )
 
 // 获取Test列表
 func GetTests(c *fiber.Ctx) error {
@@ -18,30 +15,51 @@ func GetTests(c *fiber.Ctx) error {
 	// // 获取get query参数 或者使用queryparser
 	// id := c.Query("id")
 	// maps["id"] = id
-
+	code := 200
+	message := "SUCCESS"
 	maps := &models.Test{}
-	c.QueryParser(maps)
-
+	if err := c.QueryParser(maps); err != nil {
+		code = 500
+		message = "参数解析错误"
+		logging.Error(err)
+	}
 	res := models.GetTests(0, 10, maps)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"code":    200,
-		"message": "SUCCESS",
+		"code":    code,
+		"message": message,
 		"data":    res,
-		"query":   maps,
 	})
 }
 
 // 添加test
 func AddTest(c *fiber.Ctx) error {
 	test := &models.Test{}
-	c.BodyParser(test)
+	code := 200
+	message := "SUCCESS"
+
+	if err := c.BodyParser(test); err != nil {
+		code = 500
+		message = "参数解析错误"
+		logging.Error(err)
+	}
+
+	// 入参验证
+	errors := valodates.ValidateStruct(*test)
+
+	if errors != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"code":    code,
+			"message": message,
+			"data":    errors,
+		})
+	}
 
 	res := models.AddTest(test)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"code":    200,
-		"message": "SUCCESS",
+		"code":    code,
+		"message": message,
 		"data":    res,
 	})
 }
@@ -50,24 +68,26 @@ func AddTest(c *fiber.Ctx) error {
 func EditTest(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	test := &models.Test{}
-	c.BodyParser(test)
 	code := 200
 	res := false
 	message := "SUCCESS"
 
+	if err := c.BodyParser(test); err != nil {
+		code = 500
+		message = "参数解析错误"
+		logging.Error(err)
+	}
+
 	if err != nil {
-		log.Fatal(err)
+		code = 500
+		message = "Params： id 参数解析错误"
+		logging.Error(err)
 	}
 	if models.ExistTestByID(id) {
 		res = models.EditTest(id, test)
 	} else {
 		code = 500
-	}
-
-	if res {
-		message = "SUCCESS"
-	} else {
-		message = "ERROR"
+		message = "id不存在"
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -85,21 +105,17 @@ func DelTest(c *fiber.Ctx) error {
 	message := "SUCCESS"
 
 	if err != nil {
-		log.Fatal(err)
+		code = 500
+		message = "Params： id 参数解析错误"
+		logging.Error(err)
 	}
 
 	if models.ExistTestByID(id) {
 		res = models.DeleteTest(id)
 	} else {
 		code = 500
+		message = "id不存在"
 	}
-
-	if res {
-		message = "SUCCESS"
-	} else {
-		message = "ERROR"
-	}
-
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"code":    code,

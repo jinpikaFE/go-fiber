@@ -2,8 +2,8 @@ package models
 
 import (
 	"fmt"
-	"log"
 
+	"github.com/jinpikaFE/go_fiber/pkg/logging"
 	"github.com/jinpikaFE/go_fiber/pkg/setting"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -26,7 +26,7 @@ func init() {
 
 	sec, err := setting.Cfg.GetSection("database")
 	if err != nil {
-		log.Fatal(2, "Fail to get section 'database': %v", err)
+		logging.Fatal(2, "Fail to get section 'database': %v", err)
 	}
 
 	dbType = sec.Key("TYPE").String()
@@ -42,7 +42,7 @@ func init() {
 		dbName))
 
 	if err != nil {
-		log.Fatal(err)
+		logging.Error(err)
 	}
 
 	db.SingularTable(true)
