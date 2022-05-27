@@ -2,7 +2,6 @@ package controller
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -35,7 +34,9 @@ func Upload(c *fiber.Ctx) error {
 
 	relFile, err := file.Open()
 
-	filePath := "/file/" + fmt.Sprintf("%d", time.Now().Unix()) + "." + strings.Split(file.Filename, `.`)[1]
+	logging.Error(file)
+
+	filePath := "/file/" + fmt.Sprintf("%s", time.Now().Format("2006-01-02")) + "/" + file.Filename
 
 	if err != nil {
 		message = "ERROR"
