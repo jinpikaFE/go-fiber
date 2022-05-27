@@ -45,5 +45,9 @@ func InitRouter() *fiber.App {
 		apiv1.Delete("/test/:id", controller.DelTest)
 	}
 
+	{
+		apiv1.Post("/upload", controller.Upload)
+	}
+
 	return app
 }
