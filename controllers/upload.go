@@ -12,6 +12,7 @@ import (
 )
 
 func Upload(c *fiber.Ctx) error {
+	logging.Info("/v1/upload")
 	file, err := c.FormFile("file")
 	message := "SUCCESS"
 	if err != nil {
@@ -33,8 +34,6 @@ func Upload(c *fiber.Ctx) error {
 	// }
 
 	relFile, err := file.Open()
-
-	logging.Error(file)
 
 	filePath := "/file/" + fmt.Sprintf("%s", time.Now().Format("2006-01-02")) + "/" + file.Filename
 

@@ -12,6 +12,14 @@ import (
 	"github.com/jinpikaFE/go_fiber/pkg/untils"
 )
 
+func nextLogger(c *fiber.Ctx) bool {
+	// return true 会跳过本次中间件执行
+	if c.Path() == "/v1/upload" {
+		return true
+	}
+	return false
+}
+
 func InitRouter() *fiber.App {
 	app := fiber.New(fiber.Config{
 		ReadTimeout:  setting.ReadTimeout,
@@ -20,6 +28,7 @@ func InitRouter() *fiber.App {
 
 	app.Use(requestid.New())
 	app.Use(logger.New(logger.Config{
+		Next:   nextLogger,
 		Format: "[INFO-${locals:requestid}]${time} pid: ${pid} status:${status} - ${method} path: ${path} queryParams: ${queryParams} body: ${body}\n resBody: ${resBody}\n error: ${error}\n",
 		Output: logging.F,
 	}))
@@ -32,7 +41,7 @@ func InitRouter() *fiber.App {
 
 	// JWT Middleware
 	app.Use(jwtware.New(jwtware.Config{
-		SigningKey: []byte("secret"),
+		SigningKey:   []byte("secret"),
 		ErrorHandler: untils.JwtError,
 	}))
 
