@@ -2,14 +2,16 @@ package models
 
 import (
 	"context"
-	"io"
+	"fmt"
+	"os"
 
 	"github.com/jinpikaFE/go_fiber/pkg/logging"
 	"github.com/jinpikaFE/go_fiber/pkg/tencentcos"
 )
 
-func UploadFile(file io.Reader, filePath string) bool {
-	_, err := tencentcos.Client.Object.Put(context.Background(), filePath, file, nil)
+func UploadFile(filePath string, fileName string) bool {
+	dir, _ := os.Getwd()
+	_, _, err := tencentcos.Client.Object.Upload(context.Background(), filePath, fmt.Sprintf("%s/file/%s", dir, fileName), nil)
 	if err != nil {
 		logging.Error(err)
 		return false
