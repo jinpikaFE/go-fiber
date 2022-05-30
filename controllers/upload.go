@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/jinpikaFE/go_fiber/pkg/app"
 	"github.com/jinpikaFE/go_fiber/pkg/logging"
 	"github.com/jinpikaFE/go_fiber/pkg/setting"
 	"github.com/jinpikaFE/go_fiber/pkg/untils"
@@ -13,17 +14,12 @@ import (
 )
 
 func Upload(c *fiber.Ctx) error {
+	appF := app.Fiber{C: c}
 	logging.Info("/v1/upload")
 	file, err := c.FormFile("file")
-	message := "SUCCESS"
-	code := 200
 	if err != nil {
 		logging.Error((err))
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"code":    fiber.StatusBadRequest,
-			"message": "file为空",
-			"data":    nil,
-		})
+		return appF.Response(fiber.StatusBadRequest, fiber.StatusBadRequest, "file为空", nil)
 	}
 
 	// //大小限制2Mb
@@ -39,40 +35,33 @@ func Upload(c *fiber.Ctx) error {
 
 	relatPath := "/file"
 	if res := untils.MakeDir(relatPath); !res {
-		message = "创建文件夹失败"
-		code = fiber.StatusInternalServerError
+		return appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "创建文件夹失败", nil)
 	}
 
 	if res := untils.WriteFile(relatPath, relFile, file.Filename); !res {
-		message = "写入文件失败"
-		code = fiber.StatusInternalServerError
+		return appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "写入文件失败", nil)
 	}
 
 	filePath := "/file/" + fmt.Sprintf("%s", time.Now().Format("2006-01-02")) + "/" + file.Filename
 
 	if err != nil {
-		message = "ERROR"
-		code = fiber.StatusInternalServerError
 		logging.Error(err)
+		return appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "上传cos失败", err)
 	}
 
 	res := models.UploadFile(filePath, file.Filename)
 
 	if res := untils.RemoveFile(relatPath, file.Filename); !res {
-		message = "删除本地文件失败"
-		code = fiber.StatusInternalServerError
+		return appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "删除本地文件失败", err)
 	}
 
 	if !res {
-		code = fiber.StatusInternalServerError
-		message = "上传失败"
+		return appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "上传失败", err)
 	}
 
 	url := setting.CosUrl + filePath
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"code":    code,
-		"message": message,
-		"data":    url,
-	})
+	data := map[string]interface{}{"url": url}
+
+	return appF.Response(fiber.StatusOK, fiber.StatusOK, "SUCCESS", data)
 }

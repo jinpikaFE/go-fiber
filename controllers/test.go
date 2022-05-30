@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/jinpikaFE/go_fiber/models"
+	"github.com/jinpikaFE/go_fiber/pkg/app"
 	"github.com/jinpikaFE/go_fiber/pkg/logging"
 	"github.com/jinpikaFE/go_fiber/pkg/valodates"
 )
@@ -15,111 +16,80 @@ func GetTests(c *fiber.Ctx) error {
 	// // 获取get query参数 或者使用queryparser
 	// id := c.Query("id")
 	// maps["id"] = id
-	code := 200
-	message := "SUCCESS"
+	appF := app.Fiber{C: c}
 	maps := &models.Test{}
 	if err := c.QueryParser(maps); err != nil {
-		code = 500
-		message = "参数解析错误"
 		logging.Error(err)
+		return appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "参数解析错误", err)
 	}
 	res := models.GetTests(0, 10, maps)
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"code":    code,
-		"message": message,
-		"data":    res,
-	})
+	return appF.Response(fiber.StatusOK, fiber.StatusOK, "SUCCESS", res)
 }
 
 // 添加test
 func AddTest(c *fiber.Ctx) error {
+	appF := app.Fiber{C: c}
 	test := &models.Test{}
-	code := 200
-	message := "SUCCESS"
 
 	if err := c.BodyParser(test); err != nil {
-		code = 500
-		message = "参数解析错误"
 		logging.Error(err)
+		return appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "参数解析错误", err)
 	}
 
 	// 入参验证
 	errors := valodates.ValidateStruct(*test)
 
 	if errors != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"code":    code,
-			"message": message,
-			"data":    errors,
-		})
+		return appF.Response(fiber.StatusBadRequest, fiber.StatusBadRequest, "检验参数错误", errors)
 	}
 
 	res := models.AddTest(test)
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"code":    code,
-		"message": message,
-		"data":    res,
-	})
+	return appF.Response(fiber.StatusOK, fiber.StatusOK, "SUCCESS", res)
 }
 
 // 编辑test
 func EditTest(c *fiber.Ctx) error {
+	appF := app.Fiber{C: c}
 	id, err := strconv.Atoi(c.Params("id"))
 	test := &models.Test{}
-	code := 200
 	res := false
-	message := "SUCCESS"
 
 	if err := c.BodyParser(test); err != nil {
-		code = 500
-		message = "参数解析错误"
 		logging.Error(err)
+		return appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "参数解析错误", err)
 	}
 
 	if err != nil {
-		code = 500
-		message = "Params： id 参数解析错误"
 		logging.Error(err)
+		return appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "Params： id 参数解析错误", err)
 	}
 	if models.ExistTestByID(id) {
 		res = models.EditTest(id, test)
 	} else {
-		code = 500
-		message = "id不存在"
+		return appF.Response(fiber.StatusBadRequest, fiber.StatusBadRequest, "id不存在", nil)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"code":    code,
-		"message": message,
-		"data":    res,
-	})
+	return appF.Response(fiber.StatusOK, fiber.StatusOK, "SUCCESS", res)
 }
 
 // 删除test
 func DelTest(c *fiber.Ctx) error {
+	appF := app.Fiber{C: c}
 	id, err := strconv.Atoi(c.Params("id"))
-	code := 200
 	res := false
-	message := "SUCCESS"
 
 	if err != nil {
-		code = 500
-		message = "Params： id 参数解析错误"
 		logging.Error(err)
+		return appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "Params： id 参数解析错误", err)
 	}
 
 	if models.ExistTestByID(id) {
 		res = models.DeleteTest(id)
 	} else {
-		code = 500
-		message = "id不存在"
+		return appF.Response(fiber.StatusBadRequest, fiber.StatusBadRequest, "id不存在", nil)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"code":    code,
-		"message": message,
-		"data":    res,
-	})
+	return appF.Response(fiber.StatusOK, fiber.StatusOK, "SUCCESS", res)
 }

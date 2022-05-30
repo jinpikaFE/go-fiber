@@ -24,6 +24,8 @@ var (
 	CosUrl    string
 )
 
+var RedisSetting = &Redis{}
+
 func init() {
 	var err error
 	Cfg, err = ini.Load("conf/app.ini")
@@ -35,6 +37,15 @@ func init() {
 	LoadServer()
 	LoadApp()
 	LoadTenCentCos()
+	mapTo("redis", RedisSetting)
+}
+
+type Redis struct {
+	Host        string
+	Password    string
+	MaxIdle     int
+	MaxActive   int
+	IdleTimeout time.Duration
 }
 
 func LoadBase() {
@@ -71,4 +82,12 @@ func LoadTenCentCos() {
 	SecretId = sec.Key("SECRET_ID").MustString("")
 	SecretKey = sec.Key("SECRET_KEY").MustString("")
 	CosUrl = sec.Key("COS_URL").MustString("")
+}
+
+// mapTo map section
+func mapTo(section string, v interface{}) {
+	err := Cfg.Section(section).MapTo(v)
+	if err != nil {
+		logging.Error("Cfg.MapTo %s err: %v", section, err)
+	}
 }
