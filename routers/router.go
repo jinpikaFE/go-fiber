@@ -3,12 +3,15 @@ package routers
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	jwtware "github.com/gofiber/jwt/v3"
 	controller "github.com/jinpikaFE/go_fiber/controllers"
 	"github.com/jinpikaFE/go_fiber/middleware/jwt"
 	"github.com/jinpikaFE/go_fiber/pkg/logging"
 	"github.com/jinpikaFE/go_fiber/pkg/untils"
+
+	"github.com/gofiber/fiber/v2/middleware/monitor"
 )
 
 func nextLogger(c *fiber.Ctx) bool {
@@ -19,12 +22,22 @@ func nextLogger(c *fiber.Ctx) bool {
 	return false
 }
 
+func stackTraceHandler(c *fiber.Ctx, e interface{}) {
+	logging.Error(c, e)
+}
+
 func InitRouter() *fiber.App {
 	app := fiber.New(fiber.Config{
 		// ReadTimeout:     setting.ReadTimeout,
 		// WriteTimeout:    setting.WriteTimeout,
-		BodyLimit:       1000 * 1024 * 1024,
+		BodyLimit: 1000 * 1024 * 1024,
 	})
+
+	// panic 错误会被该中间件捕获
+	app.Use(recover.New(recover.Config{
+		EnableStackTrace:  true,
+		StackTraceHandler: stackTraceHandler,
+	}))
 
 	app.Use(requestid.New())
 	app.Use(logger.New(logger.Config{
@@ -32,6 +45,9 @@ func InitRouter() *fiber.App {
 		Format: "[INFO-${locals:requestid}]${time} pid: ${pid} status:${status} - ${method} path: ${path} queryParams: ${queryParams} body: ${body}\n resBody: ${resBody}\n error: ${error}\n",
 		Output: logging.F,
 	}))
+
+	// 监控
+	app.Get("/metrics", monitor.New())
 
 	apiv1 := app.Group("/v1")
 
