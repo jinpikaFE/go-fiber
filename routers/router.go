@@ -8,7 +8,6 @@ import (
 	controller "github.com/jinpikaFE/go_fiber/controllers"
 	"github.com/jinpikaFE/go_fiber/middleware/jwt"
 	"github.com/jinpikaFE/go_fiber/pkg/logging"
-	"github.com/jinpikaFE/go_fiber/pkg/setting"
 	"github.com/jinpikaFE/go_fiber/pkg/untils"
 )
 
@@ -22,8 +21,9 @@ func nextLogger(c *fiber.Ctx) bool {
 
 func InitRouter() *fiber.App {
 	app := fiber.New(fiber.Config{
-		ReadTimeout:  setting.ReadTimeout,
-		WriteTimeout: setting.WriteTimeout,
+		// ReadTimeout:     setting.ReadTimeout,
+		// WriteTimeout:    setting.WriteTimeout,
+		BodyLimit:       1000 * 1024 * 1024,
 	})
 
 	app.Use(requestid.New())
