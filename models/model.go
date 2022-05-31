@@ -13,14 +13,14 @@ var db *gorm.DB
 
 // 所有表都统一加入下面三个字段
 type Model struct {
-	ID int `gorm:"primary_key" json:"id"`
-	CreatedOn int `json:"created_on"`
+	ID         int `gorm:"primary_key" json:"id"`
+	CreatedOn  int `json:"created_on"`
 	ModifiedOn int `json:"modified_on"`
 }
 
 func init() {
 	var (
-		err error
+		err                                  error
 		dbType, dbName, user, password, host string
 	)
 
@@ -43,6 +43,7 @@ func init() {
 
 	if err != nil {
 		logging.Error(err)
+		panic(err)
 	}
 
 	db.SingularTable(true)
