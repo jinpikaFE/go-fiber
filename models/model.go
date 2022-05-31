@@ -43,7 +43,6 @@ func init() {
 
 	if err != nil {
 		logging.Error(err)
-		panic(err)
 	}
 
 	db.SingularTable(true)
