@@ -13,6 +13,16 @@ type Test struct {
 	Name string `validate:"required,min=3,max=32" query:"name" json:"name" xml:"name" form:"name"`
 }
 
+// GetArticleTotal gets the total number of articles based on the constraints
+func GetTestTotal(maps interface{}) (int, error) {
+	var count int
+	if err := db.Model(&Test{}).Where(maps).Count(&count).Error; err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func GetTests(pageNum int, pageSize int, maps interface{}) ([]*Test, error) {
 	var tests []*Test
 	err := db.Where(maps).Offset(pageNum).Limit(pageSize).Find(&tests).Error

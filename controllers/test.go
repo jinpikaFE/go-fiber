@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/jinpikaFE/go_fiber/models"
 	"github.com/jinpikaFE/go_fiber/pkg/app"
+	"github.com/jinpikaFE/go_fiber/pkg/e"
 	"github.com/jinpikaFE/go_fiber/pkg/logging"
 	"github.com/jinpikaFE/go_fiber/pkg/valodates"
 )
@@ -18,16 +19,37 @@ func GetTests(c *fiber.Ctx) error {
 	// maps["id"] = id
 	appF := app.Fiber{C: c}
 	maps := &models.Test{}
-	if err := c.QueryParser(maps); err != nil {
+	page := &e.PageStruct{}
+	err2 := c.QueryParser(page)
+
+	if err := c.QueryParser(maps); err != nil && err2 != nil {
 		logging.Error(err)
 		return appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "参数解析错误", err)
 	}
-	res, errs := models.GetTests(0, 10, maps)
+
+	// 入参验证
+	if errors := valodates.ValidateStruct(*page); errors != nil {
+		return appF.Response(fiber.StatusBadRequest, fiber.StatusBadRequest, "检验参数错误", errors)
+	}
+
+	res, errs := models.GetTests((page.Page-1)*page.PageSize, page.PageSize, maps)
 	if errs != nil {
 		return appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "查询失败", errs)
 	}
 
-	return appF.Response(fiber.StatusOK, fiber.StatusOK, "SUCCESS", res)
+	total, errTotal:= models.GetTestTotal(maps)
+	if errTotal != nil {
+		return appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "查询失败", errTotal)
+	}
+	
+
+	data := make(map[string]interface{})
+	data["list"] = res
+	data["total"] = total
+	data["pageSize"] = page.PageSize
+	data["page"] = page.Page
+
+	return appF.Response(fiber.StatusOK, fiber.StatusOK, "SUCCESS", data)
 }
 
 // 添加test
