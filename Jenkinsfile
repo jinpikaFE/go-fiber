@@ -17,5 +17,10 @@ pipeline {
                 sh 'go get -u' 
             }
         }
+        stage('Build') { 
+            steps {
+                sh 'go build -o main main.go' 
+            }
+        }
     }
 }
