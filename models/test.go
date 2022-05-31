@@ -13,36 +13,45 @@ type Test struct {
 	Name string `validate:"required,min=3,max=32" query:"name" json:"name" xml:"name" form:"name"`
 }
 
-func GetTests(pageNum int, pageSize int, maps interface{}) (tests []Test) {
-	db.Where(maps).Offset(pageNum).Limit(pageSize).Find(&tests)
-
-	return
+func GetTests(pageNum int, pageSize int, maps interface{}) ([]*Test, error) {
+	var tests []*Test
+	err := db.Where(maps).Offset(pageNum).Limit(pageSize).Find(&tests).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, err
+	}
+	return tests, nil
 }
 
-func AddTest(test *Test) bool {
-	db.Create(&test)
+func AddTest(test *Test) error {
+	if err := db.Create(&test).Error; err != nil {
+		return err
+	}
 
-	return true
+	return nil
 }
 
-func EditTest(id int, data interface{}) bool {
-	db.Model(&Test{}).Where("id = ?", id).Updates(data)
+func EditTest(id int, data interface{}) error {
+	if err :=db.Model(&Test{}).Where("id = ?", id).Updates(data).Error;err!= nil {
+		return err
+	}
 
-	return true
+	return nil
 }
 
-func DeleteTest(id int) bool {
-	db.Where("id = ?", id).Delete(Test{})
+func DeleteTest(id int) error {
+	if err := db.Where("id = ?", id).Delete(Test{}).Error; err!= nil {
+		return err
+	}
 
-	return true
+	return nil
 }
 
 // 根据id判断test 对象是否存在
 func ExistTestByID(id int) bool {
-    var test Test
-    db.Select("id").Where("id = ?", id).First(&test)
+	var test Test
+	db.Select("id").Where("id = ?", id).First(&test)
 
-    return test.ID > 0
+	return test.ID > 0
 }
 
 // gorm所支持的回调方法：

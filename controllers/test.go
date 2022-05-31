@@ -22,7 +22,10 @@ func GetTests(c *fiber.Ctx) error {
 		logging.Error(err)
 		return appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "参数解析错误", err)
 	}
-	res := models.GetTests(0, 10, maps)
+	res, errs := models.GetTests(0, 10, maps)
+	if errs != nil {
+		return appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "查询失败", errs)
+	}
 
 	return appF.Response(fiber.StatusOK, fiber.StatusOK, "SUCCESS", res)
 }
@@ -44,9 +47,13 @@ func AddTest(c *fiber.Ctx) error {
 		return appF.Response(fiber.StatusBadRequest, fiber.StatusBadRequest, "检验参数错误", errors)
 	}
 
-	res := models.AddTest(test)
+	err := models.AddTest(test)
 
-	return appF.Response(fiber.StatusOK, fiber.StatusOK, "SUCCESS", res)
+	if err != nil {
+		appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "添加失败", err)
+	}
+
+	return appF.Response(fiber.StatusOK, fiber.StatusOK, "SUCCESS", nil)
 }
 
 // 编辑test
@@ -54,7 +61,6 @@ func EditTest(c *fiber.Ctx) error {
 	appF := app.Fiber{C: c}
 	id, err := strconv.Atoi(c.Params("id"))
 	test := &models.Test{}
-	res := false
 
 	if err := c.BodyParser(test); err != nil {
 		logging.Error(err)
@@ -66,19 +72,19 @@ func EditTest(c *fiber.Ctx) error {
 		return appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "Params： id 参数解析错误", err)
 	}
 	if models.ExistTestByID(id) {
-		res = models.EditTest(id, test)
-	} else {
-		return appF.Response(fiber.StatusBadRequest, fiber.StatusBadRequest, "id不存在", nil)
+		if err := models.EditTest(id, test); err != nil {
+			return appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "编辑失败", err)
+		}
+		return appF.Response(fiber.StatusOK, fiber.StatusOK, "SUCCESS", nil)
 	}
 
-	return appF.Response(fiber.StatusOK, fiber.StatusOK, "SUCCESS", res)
+	return appF.Response(fiber.StatusBadRequest, fiber.StatusBadRequest, "id不存在", nil)
 }
 
 // 删除test
 func DelTest(c *fiber.Ctx) error {
 	appF := app.Fiber{C: c}
 	id, err := strconv.Atoi(c.Params("id"))
-	res := false
 
 	if err != nil {
 		logging.Error(err)
@@ -86,10 +92,12 @@ func DelTest(c *fiber.Ctx) error {
 	}
 
 	if models.ExistTestByID(id) {
-		res = models.DeleteTest(id)
-	} else {
-		return appF.Response(fiber.StatusBadRequest, fiber.StatusBadRequest, "id不存在", nil)
+		if err := models.DeleteTest(id); err != nil {
+			return appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "删除是啊比", err)
+		}
+		return appF.Response(fiber.StatusOK, fiber.StatusOK, "SUCCESS", nil)
 	}
 
-	return appF.Response(fiber.StatusOK, fiber.StatusOK, "SUCCESS", res)
+	return appF.Response(fiber.StatusBadRequest, fiber.StatusBadRequest, "id不存在", nil)
+
 }
