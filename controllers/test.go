@@ -69,7 +69,7 @@ func AddTest(c *fiber.Ctx) error {
 		return appF.Response(fiber.StatusBadRequest, fiber.StatusBadRequest, "检验参数错误", errors)
 	}
 
-	err := models.AddTest(test)
+	err := models.AddTest(*test)
 
 	if err != nil {
 		appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "添加失败", err)

@@ -10,7 +10,7 @@ type Test struct {
 	Model
 
 	// query tag是query参数别名，json xml，form适合post
-	Name string `validate:"required,min=3,max=32" query:"name" json:"name" xml:"name" form:"name"`
+	Name *string `validate:"required,min=3,max=32" query:"name" json:"name" xml:"name" form:"name"`
 }
 
 // GetArticleTotal gets the total number of articles based on the constraints
@@ -32,7 +32,7 @@ func GetTests(pageNum int, pageSize int, maps interface{}) ([]*Test, error) {
 	return tests, nil
 }
 
-func AddTest(test *Test) error {
+func AddTest(test Test) error {
 	if err := db.Create(&test).Error; err != nil {
 		return err
 	}
@@ -41,7 +41,7 @@ func AddTest(test *Test) error {
 }
 
 func EditTest(id int, data interface{}) error {
-	if err :=db.Model(&Test{}).Where("id = ?", id).Updates(data).Error;err!= nil {
+	if err := db.Model(&Test{}).Where("id = ?", id).Updates(data).Error; err != nil {
 		return err
 	}
 
@@ -49,7 +49,7 @@ func EditTest(id int, data interface{}) error {
 }
 
 func DeleteTest(id int) error {
-	if err := db.Where("id = ?", id).Delete(Test{}).Error; err!= nil {
+	if err := db.Where("id = ?", id).Delete(Test{}).Error; err != nil {
 		return err
 	}
 
