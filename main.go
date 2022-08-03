@@ -7,6 +7,7 @@ import (
 	"github.com/jinpikaFE/go_fiber/pkg/setting"
 	"github.com/jinpikaFE/go_fiber/pkg/tencent"
 	"github.com/jinpikaFE/go_fiber/routers"
+	_ "github.com/jinpikaFE/go_fiber/docs"
 )
 
 func init() {

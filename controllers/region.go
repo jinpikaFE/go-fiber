@@ -10,6 +10,15 @@ import (
 	"github.com/vicanso/go-axios"
 )
 
+// 获取省市区
+// @Summary 获取省市区
+// @Description 获取省市区
+// @Tags 获取省市区
+// @Accept json
+// @Produce json
+// @Success 200 {object} ResponseHTTP{}
+// @Failure 503 {object} ResponseHTTP{}
+// @Router /v1/region [get]
 func GetRegion(c *fiber.Ctx) error {
 	appF := app.Fiber{C: c}
 	// 使用axios进行请求

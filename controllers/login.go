@@ -18,7 +18,23 @@ import (
 	"github.com/vicanso/go-axios"
 )
 
+// ResponseHTTP represents response body of this API
+type ResponseHTTP struct {
+	Code    int         `json:"code"`
+	Data    interface{} `json:"data"`
+	Message string      `json:"message"`
+}
+
 // 登录
+// @Summary 登录接口
+// @Description 登录接口
+// @Tags 登录
+// @Accept json
+// @Produce json
+// @Param login body models.Login true "Login"
+// @Success 200 {object} ResponseHTTP{}
+// @Failure 503 {object} ResponseHTTP{}
+// @Router /v1/login [post]
 func Login(c *fiber.Ctx) error {
 	appF := app.Fiber{C: c}
 	types := &models.Type{}
@@ -212,6 +228,15 @@ func Login(c *fiber.Ctx) error {
 }
 
 // 获取验证码
+// @Summary 获取验证码
+// @Description 获取验证码
+// @Tags 获取验证码
+// @Accept json
+// @Produce json
+// @Param mobile body models.LoginMobile.Mobile true "mobile"
+// @Success 200 {object} ResponseHTTP{}
+// @Failure 503 {object} ResponseHTTP{}
+// @Router /v1/captcha [post]
 func GetCaptcha(c *fiber.Ctx) error {
 	appF := app.Fiber{C: c}
 	// 短信验证码发送

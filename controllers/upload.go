@@ -13,6 +13,15 @@ import (
 	"github.com/jinpikaFE/go_fiber/models"
 )
 
+// 文件上传
+// @Summary 文件上传
+// @Description 文件上传
+// @Tags 文件上传
+// @Accept json
+// @Produce json
+// @Success 200 {object} ResponseHTTP{}
+// @Failure 503 {object} ResponseHTTP{}
+// @Router /v1/upload [post]
 func Upload(c *fiber.Ctx) error {
 	appF := app.Fiber{C: c}
 	logging.Info("/v1/upload")

@@ -14,6 +14,8 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 
 	"github.com/gofiber/fiber/v2/middleware/cors"
+
+	swagger "github.com/arsmn/fiber-swagger/v2"
 )
 
 func nextLogger(c *fiber.Ctx) bool {
@@ -46,6 +48,16 @@ func InitRouter() *fiber.App {
 		Next:   nextLogger,
 		Format: "[INFO-${locals:requestid}]${time} pid: ${pid} status:${status} - ${method} path: ${path} queryParams: ${queryParams} body: ${body}\n resBody: ${resBody}\n error: ${error}\n",
 		Output: logging.F,
+	}))
+
+	app.Static(
+		"/docs",  // mount address
+		"./docs", // path to the file folder
+	)
+
+	app.Get("/docs/*", swagger.New(swagger.Config{ // custom
+		URL:         "http://localhost:8081/docs/swagger.json",
+		DeepLinking: false,
 	}))
 
 	app.Use(cors.New(cors.Config{

@@ -14,6 +14,16 @@ import (
 )
 
 // 获取User列表
+// @Summary 获取User列表
+// @Description 获取User列表
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param user query models.User true "user"
+// @Param page query e.PageStruct true "page"
+// @Success 200 {object} ResponseHTTP{}
+// @Failure 503 {object} ResponseHTTP{}
+// @Router /v1/users [get]
 func GetUsers(c *fiber.Ctx) error {
 	// maps := make(map[string]interface{})
 	// // 获取get query参数 或者使用queryparser
@@ -53,7 +63,16 @@ func GetUsers(c *fiber.Ctx) error {
 	return appF.Response(fiber.StatusOK, fiber.StatusOK, "SUCCESS", data)
 }
 
-// 获取User
+// 获取User详情
+// @Summary 获取User详情
+// @Description 获取User详情
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param user query models.User true "user"
+// @Success 200 {object} ResponseHTTP{}
+// @Failure 503 {object} ResponseHTTP{}
+// @Router /v1/user [get]
 func GetUser(c *fiber.Ctx) error {
 	// maps := make(map[string]interface{})
 	// // 获取get query参数 或者使用queryparser
@@ -81,6 +100,15 @@ func GetUser(c *fiber.Ctx) error {
 }
 
 // 添加user
+// @Summary 添加user
+// @Description 添加user
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param user body models.User true "user"
+// @Success 200 {object} ResponseHTTP{}
+// @Failure 503 {object} ResponseHTTP{}
+// @Router /v1/user [post]
 func AddUser(c *fiber.Ctx) error {
 	appF := app.Fiber{C: c}
 	user := &models.User{}
@@ -108,6 +136,16 @@ func AddUser(c *fiber.Ctx) error {
 }
 
 // 编辑用户
+// @Summary 编辑用户
+// @Description 编辑用户
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param id path int true "User ID"
+// @Param user body models.User true "user"
+// @Success 200 {object} ResponseHTTP{}
+// @Failure 503 {object} ResponseHTTP{}
+// @Router /v1/user/{id} [put]
 func EditUser(c *fiber.Ctx) error {
 	appF := app.Fiber{C: c}
 	id, err := strconv.Atoi(c.Params("id"))
@@ -166,6 +204,15 @@ func EditUser(c *fiber.Ctx) error {
 }
 
 // 删除user
+// @Summary 删除user
+// @Description 删除user
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param id path int true "User ID"
+// @Success 200 {object} ResponseHTTP{}
+// @Failure 503 {object} ResponseHTTP{}
+// @Router /v1/user/{id} [delete]
 func DelUser(c *fiber.Ctx) error {
 	appF := app.Fiber{C: c}
 	id, err := strconv.Atoi(c.Params("id"))
