@@ -69,7 +69,7 @@ func AddTest(c *fiber.Ctx) error {
 		return appF.Response(fiber.StatusBadRequest, fiber.StatusBadRequest, "检验参数错误", errors)
 	}
 
-	err := models.AddTest(*test)
+	err := models.AddTest(test)
 
 	if err != nil {
 		appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "添加失败", err)
@@ -115,7 +115,7 @@ func DelTest(c *fiber.Ctx) error {
 
 	if models.ExistTestByID(id) {
 		if err := models.DeleteTest(id); err != nil {
-			return appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "删除是啊比", err)
+			return appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "删除失败", err)
 		}
 		return appF.Response(fiber.StatusOK, fiber.StatusOK, "SUCCESS", nil)
 	}

@@ -8,7 +8,7 @@ type Fiber struct {
 
 func (g *Fiber) Response(httpCode, errCode int, message string, data interface{}) error {
 
-	return g.C.Status(httpCode).JSON(fiber.Map{
+	return g.C.Status(fiber.StatusOK).JSON(fiber.Map{
 		"code":    errCode,
 		"message": message,
 		"data":    data,

@@ -26,6 +26,8 @@ var (
 
 var RedisSetting = &Redis{}
 
+var SmsStrSetting = &SmsStr{}
+
 func init() {
 	var err error
 	Cfg, err = ini.Load("conf/app.ini")
@@ -38,6 +40,7 @@ func init() {
 	LoadApp()
 	LoadTenCentCos()
 	mapTo("redis", RedisSetting)
+	mapTo("tencent_sms", SmsStrSetting)
 }
 
 type Redis struct {
@@ -46,6 +49,12 @@ type Redis struct {
 	MaxIdle     int
 	MaxActive   int
 	IdleTimeout time.Duration
+}
+
+type SmsStr struct {
+	SMS_APPID string
+	SIGN_NAME string
+	TEMP_ID string
 }
 
 func LoadBase() {

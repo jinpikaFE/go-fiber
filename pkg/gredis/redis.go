@@ -30,12 +30,13 @@ func Setup() error {
 					return nil, err
 				}
 			}
-			logging.Error(err)
 			return c, err
 		},
 		TestOnBorrow: func(c redis.Conn, t time.Time) error {
 			_, err := c.Do("PING")
-			logging.Error(err)
+			if err != nil {
+				logging.Error(err)
+			}
 			return err
 		},
 	}
@@ -44,13 +45,16 @@ func Setup() error {
 }
 
 // 设置reids time失效时间 seconds
-func Set(key string, data interface{}, time int) error {
+func Set(key string, data interface{}, time int, isString bool) error {
 	conn := RedisConn.Get()
 	defer conn.Close()
-
-	value, err := json.Marshal(data)
-	if err != nil {
-		return err
+	value := data
+	var err error
+	if !isString {
+		value, err = json.Marshal(data)
+		if err != nil {
+			return err
+		}
 	}
 
 	_, err = conn.Do("SET", key, value)

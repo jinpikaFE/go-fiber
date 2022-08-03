@@ -12,6 +12,8 @@ import (
 	"github.com/jinpikaFE/go_fiber/pkg/untils"
 
 	"github.com/gofiber/fiber/v2/middleware/monitor"
+
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func nextLogger(c *fiber.Ctx) bool {
@@ -46,6 +48,10 @@ func InitRouter() *fiber.App {
 		Output: logging.F,
 	}))
 
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "http://localhost:10086",
+	}))
+
 	// 监控
 	app.Get("/metrics", monitor.New())
 
@@ -53,6 +59,8 @@ func InitRouter() *fiber.App {
 
 	{
 		apiv1.Post("/login", controller.Login)
+		apiv1.Post("/captcha", controller.GetCaptcha)
+		apiv1.Get("/region", controller.GetRegion)
 	}
 
 	// JWT Middleware
@@ -68,6 +76,14 @@ func InitRouter() *fiber.App {
 		apiv1.Post("/test", controller.AddTest)
 		apiv1.Put("/test/:id", controller.EditTest)
 		apiv1.Delete("/test/:id", controller.DelTest)
+	}
+
+	{
+		apiv1.Get("/users", controller.GetUsers)
+		apiv1.Get("/user", controller.GetUser)
+		apiv1.Post("/user", controller.AddUser)
+		apiv1.Put("/user/:id", controller.EditUser)
+		apiv1.Delete("/user/:id", controller.DelUser)
 	}
 
 	{

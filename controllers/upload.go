@@ -17,6 +17,7 @@ func Upload(c *fiber.Ctx) error {
 	appF := app.Fiber{C: c}
 	logging.Info("/v1/upload")
 	file, err := c.FormFile("file")
+	logging.Info(*file)
 	if err != nil {
 		logging.Error((err))
 		return appF.Response(fiber.StatusBadRequest, fiber.StatusBadRequest, "file为空", nil)
