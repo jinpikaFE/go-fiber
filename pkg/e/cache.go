@@ -6,6 +6,6 @@ const (
 )
 
 type PageStruct struct {
-	Page     int `validate:"required" query:"page" json:"page" xml:"page" form:"page"`
+	Page     int `validate:"required" query:"pageNum" json:"pageNum" xml:"pageNum" form:"pageNum"`
 	PageSize int `validate:"required" query:"pageSize" json:"pageSize" xml:"pageSize" form:"pageSize"`
 }

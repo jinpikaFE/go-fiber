@@ -75,3 +75,48 @@ func Upload(c *fiber.Ctx) error {
 
 	return appF.Response(fiber.StatusOK, fiber.StatusOK, "SUCCESS", data)
 }
+
+// 代码源文件上传
+// @Summary 代码源文件上传
+// @Description 代码源文件上传
+// @Tags 文件上传
+// @Accept json
+// @Produce json
+// @Success 200 {object} ResponseHTTP{}
+// @Failure 503 {object} ResponseHTTP{}
+// @Router /v1/uploadSource [post]
+func UploadSource(c *fiber.Ctx) error {
+	appF := app.Fiber{C: c}
+	logging.Info("/v1/fiber")
+	file, err := c.FormFile("file")
+	logging.Info(*file)
+	if err != nil {
+		logging.Error((err))
+		return appF.Response(fiber.StatusBadRequest, fiber.StatusBadRequest, "file为空", nil)
+	}
+
+	// 获取其他参数
+	projectName := c.FormValue("projectName")
+
+	// 打开上传文件
+	fileToUpload, err := file.Open()
+	if err != nil {
+		logging.Error(err)
+		return appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "上传cos失败", err)
+	}
+	defer fileToUpload.Close()
+
+	filePath := "/source/" + projectName + "/" + file.Filename
+
+	_, errPut := models.PutFile(filePath, fileToUpload)
+
+	if errPut != nil {
+		return appF.Response(fiber.StatusInternalServerError, fiber.StatusInternalServerError, "上传失败", errPut)
+	}
+
+	url := setting.CosUrl + filePath
+
+	data := map[string]interface{}{"url": url}
+
+	return appF.Response(fiber.StatusOK, fiber.StatusOK, "SUCCESS", data)
+}

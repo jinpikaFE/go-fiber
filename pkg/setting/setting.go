@@ -1,6 +1,7 @@
 package setting
 
 import (
+	"runtime"
 	"time"
 
 	"github.com/go-ini/ini"
@@ -29,8 +30,14 @@ var RedisSetting = &Redis{}
 var SmsStrSetting = &SmsStr{}
 
 func init() {
+	version := runtime.Version()
 	var err error
-	Cfg, err = ini.Load("conf/app.ini")
+	var confFile string
+	confFile = "conf/app.ini"
+	if version == "production" {
+		confFile = "conf/app.pro.ini"
+	}
+	Cfg, err = ini.Load(confFile)
 	if err != nil {
 		logging.Fatal("Fail to parse 'conf/app.ini': %v", err)
 	}
@@ -54,7 +61,7 @@ type Redis struct {
 type SmsStr struct {
 	SMS_APPID string
 	SIGN_NAME string
-	TEMP_ID string
+	TEMP_ID   string
 }
 
 func LoadBase() {

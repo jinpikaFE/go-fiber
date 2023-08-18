@@ -12,15 +12,15 @@ pipeline {
                 sh 'go env -w GOARCH=amd64'
             }
         }
-        stage('Get') { 
-            steps {
-                sh 'go get -u' 
-            }
-        }
-        stage('Build') { 
-            steps {
-                sh 'go build -o main main.go' 
-            }
-        }
+        // stage('Get') { 
+        //     steps {
+        //         sh 'go get -u' 
+        //     }
+        // }
+        // stage('Build') { 
+        //     steps {
+        //         sh 'go build -tags production -o main main.go' 
+        //     }
+        // }
     }
 }

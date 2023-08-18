@@ -1,15 +1,15 @@
 package routers
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
-	jwtware "github.com/gofiber/jwt/v3"
 	controller "github.com/jinpikaFE/go_fiber/controllers"
-	"github.com/jinpikaFE/go_fiber/middleware/jwt"
 	"github.com/jinpikaFE/go_fiber/pkg/logging"
-	"github.com/jinpikaFE/go_fiber/pkg/untils"
+	"github.com/jinpikaFE/go_fiber/pkg/setting"
 
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 
@@ -55,13 +55,22 @@ func InitRouter() *fiber.App {
 		"./docs", // path to the file folder
 	)
 
+	// swag init 命令生成
 	app.Get("/docs/*", swagger.New(swagger.Config{ // custom
-		URL:         "http://localhost:8081/docs/swagger.json",
+		URL:         fmt.Sprintf("http://localhost:%d/docs/swagger.json", setting.HTTPPort),
 		DeepLinking: false,
 	}))
 
+	// // 跨域
+	// app.Use(cors.New(cors.Config{
+	// 	AllowOrigins: "http://localhost:8080",
+	// }))
+
+	// 跨域
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://localhost:10086",
+		AllowOrigins: "*",
+		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
+		AllowHeaders: "*",
 	}))
 
 	// 监控
@@ -70,18 +79,15 @@ func InitRouter() *fiber.App {
 	apiv1 := app.Group("/v1")
 
 	{
-		apiv1.Post("/login", controller.Login)
-		apiv1.Post("/captcha", controller.GetCaptcha)
 		apiv1.Get("/region", controller.GetRegion)
 	}
 
-	// JWT Middleware
-	app.Use(jwtware.New(jwtware.Config{
-		SigningKey:   []byte("secret"),
-		ErrorHandler: untils.JwtError,
-	}))
-
-	apiv1.Use(jwt.Jwt)
+	{
+		apiv1.Post("/mgb/monitor", controller.SetMgbData)
+		apiv1.Get("/mgb/monitor", controller.GetMgbMonitor)
+		apiv1.Get("/mgb/monitor/screen/:id", controller.GetMgbRecordScreen)
+		apiv1.Get("/mgb/monitor/statist", controller.GetStatistRes)
+	}
 
 	{
 		apiv1.Get("/test", controller.GetTests)
@@ -91,15 +97,8 @@ func InitRouter() *fiber.App {
 	}
 
 	{
-		apiv1.Get("/users", controller.GetUsers)
-		apiv1.Get("/user", controller.GetUser)
-		apiv1.Post("/user", controller.AddUser)
-		apiv1.Put("/user/:id", controller.EditUser)
-		apiv1.Delete("/user/:id", controller.DelUser)
-	}
-
-	{
 		apiv1.Post("/upload", controller.Upload)
+		apiv1.Post("/uploadSource", controller.UploadSource)
 	}
 
 	return app

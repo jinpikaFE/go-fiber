@@ -11,7 +11,15 @@ import (
 	"github.com/jinpikaFE/go_fiber/pkg/valodates"
 )
 
-// 获取Test列表
+// Test
+// @Summary Test
+// @Description Test
+// @Tags Test
+// @Accept json
+// @Produce json
+// @Success 200 {object} ResponseHTTP{}
+// @Failure 503 {object} ResponseHTTP{}
+// @Router /v1/test [get]
 func GetTests(c *fiber.Ctx) error {
 	// maps := make(map[string]interface{})
 	// // 获取get query参数 或者使用queryparser
