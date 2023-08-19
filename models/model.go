@@ -49,5 +49,9 @@ func init() {
 
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(100)
-	db.AutoMigrate(&Test{})
+	fmt.Print(setting.RunMode)
+	// 开发环境才实时迁移数据库
+	if setting.RunMode == "dev" {
+		db.AutoMigrate(&Test{})
+	}
 }

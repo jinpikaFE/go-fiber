@@ -1,7 +1,8 @@
 package setting
 
 import (
-	"runtime"
+	"flag"
+	"fmt"
 	"time"
 
 	"github.com/go-ini/ini"
@@ -25,16 +26,40 @@ var (
 	CosUrl    string
 )
 
+type Redis struct {
+	Host        string
+	Password    string
+	MaxIdle     int
+	MaxActive   int
+	IdleTimeout time.Duration
+}
+
+type SmsStr struct {
+	SMS_APPID string
+	SIGN_NAME string
+	TEMP_ID   string
+}
+
+type Mongo struct {
+	Host     string
+	Password string
+	UserName string
+}
+
 var RedisSetting = &Redis{}
 
 var SmsStrSetting = &SmsStr{}
 
+var MongoSetting = &Mongo{}
+
 func init() {
-	version := runtime.Version()
+	env := flag.String("env", "dev", "Environment to load config for")
+	flag.Parse()
+	fmt.Println(*env)
 	var err error
 	var confFile string
 	confFile = "conf/app.ini"
-	if version == "production" {
+	if *env == "pro" {
 		confFile = "conf/app.pro.ini"
 	}
 	Cfg, err = ini.Load(confFile)
@@ -48,20 +73,7 @@ func init() {
 	LoadTenCentCos()
 	mapTo("redis", RedisSetting)
 	mapTo("tencent_sms", SmsStrSetting)
-}
-
-type Redis struct {
-	Host        string
-	Password    string
-	MaxIdle     int
-	MaxActive   int
-	IdleTimeout time.Duration
-}
-
-type SmsStr struct {
-	SMS_APPID string
-	SIGN_NAME string
-	TEMP_ID   string
+	mapTo("mongo", MongoSetting)
 }
 
 func LoadBase() {
